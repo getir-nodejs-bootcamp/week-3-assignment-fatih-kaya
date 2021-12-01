@@ -1,0 +1,33 @@
+{
+  "name": "express-server",
+  "version": "1.0.0",
+  "description": "An express web server that logs each request and use in memory array database",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/getir-nodejs-bootcamp/week-3-assignment-fatih-kaya.git"
+  },
+  "keywords": [
+    "node",
+    "express",
+    "http",
+    "morgan"
+  ],
+  "author": "Fatih Kaya",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/getir-nodejs-bootcamp/week-3-assignment-fatih-kaya/issues"
+  },
+  "homepage": "https://github.com/getir-nodejs-bootcamp/week-3-assignment-fatih-kaya#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
