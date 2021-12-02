@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const bearerToken = require('express-bearer-token');
+const _ = require('lodash');
 const db = require('./data/db');
 
 // instantiate express application
@@ -19,7 +20,9 @@ app.use(bodyParser.json());
 // instantiate bearer token as first middleware
 app.use(bearerToken());
 
-// continue middleware with
+// TODO: LOG REQUESTS BY MORGAN
+
+// continue middleware with Bearer token Authorization
 app.use(function (req, res, next) {
   if(req.token == PUBLIC_KEY){
     next()
@@ -31,7 +34,7 @@ app.use(function (req, res, next) {
   }
 });
 
-// TODO: bütün res.send res.json olarak güncellenecek
+
 app.get('/', (req, res) => {
     res.json({msg: 'api is ready to receive requests. please use /inventory endpoint'});
 });
@@ -51,25 +54,52 @@ app.get('/inventory/:id', (req, res) => {
 });
 
 app.put('/inventory/:id', (req, res) => {
+
+    // get id from parameter
     const {id} = req.params;
-    const {quantity, price} = req.body;
+
     const itemIndex = db.findIndex( item  => item.id === Number(id) );
     const item = db[itemIndex]
+
+    if (!item)
+      res.status(400).json({msg: `Cannot handle PUT request item with id ${id} does not exists`}); 
+
     if (item) {
-      item.quantity = quantity;
-      item.price = price;
-      res.json(db[itemIndex]);
+    // only quantity and price can be modified
+    const {quantity, price} = req.body;
+
+    // id, item name and category are ignored from request body for resiliency in inventory management
+    const {id, name, category} = item;
+
+    // new object is created due to PUT method
+    const modifiedItem = {
+      'id': id,
+      'name': name,
+      'category': category,
+      'quantity': quantity,
+      'price': price
+    };
+    res.status(200).json(modifiedItem);
     } else {
       res.status(400).json({msg: 'Cannot handle PUT request'});
     }
 });
 
 app.patch('/inventory/:id', (req, res) => {
+
+    // get id from parameter 
     const {id} = req.params;
+
+    // only quantity and price can be modified
+    // id, item name and category are ignored from request body for resiliency in inventory management
     const {quantity, price} = req.body;
+
     const itemIndex = db.findIndex( item  => item.id === Number(id) );
     const item = db[itemIndex]
+
     if (item) {
+    // change quantity and price attributes as requested
+    // partial modification is due to PATCH method.
       item.quantity = quantity;
       item.price = price;
       res.json(db[itemIndex]);
@@ -78,38 +108,61 @@ app.patch('/inventory/:id', (req, res) => {
     }
 });
 
-// TODO: CHECK OBJECT KEYS, CATEGORIES, VALID PRICES ETC
-app.post('/inventory', (req, res, next) => {
-    console.log(req.body)
-    // TODO: body boş olsa da ekliyor
-    if (req.body) {
-        const {item, category, quantity, price} = req.body;
-        let lastID = db[db.length-1].id;
-        // TODO: DELETE CONSOLE.LOG FOR PRODUCTION
-        console.log("lastID:" + lastID)
-        const newItemID = lastID + 1;
-        // TODO: DELETE CONSOLE.LOG FOR PRODUCTION
-        console.log(newItemID)
-        const newItem = {
-            "id": newItemID,
-            "item": item,
-            "category": category,
-            "quantity": quantity,
-            "price": price
+
+app.post('/inventory', (req, res) => {
+
+    // make sure that request body has the following properties
+    if (req.body.hasOwnProperty('name')
+       && req.body.hasOwnProperty('category')
+       && req.body.hasOwnProperty('quantity')
+       && req.body.hasOwnProperty('price')) {
+        
+        const {name, category, quantity, price} = req.body;
+        
+        // get unique item categories from db by using lodash library
+        const categories = _.uniq(_.map(db, 'category'));
+        console.log(category)
+        // check category is valid or not
+        if (!categories.includes(category))
+          res.status(400).json({msg: `Category '${category}' does not exists in the inventory. Please choose from ${categories.join(' | ')}`});
+
+        // check price is valid or not
+        else if (price < 0)
+          res.status(400).json({msg: 'Price cannot be less than zero'});
+
+        // check quantity is valid or not
+        else if (quantity < 0)
+          res.status(400).json({msg: 'Quantity cannot be less than zero'});
+
+        // insert new record
+        else {
+          let lastID = db[db.length-1].id;
+          const newItemID = lastID + 1;
+  
+          const newItem = {
+              'id': newItemID,
+              'name': name,
+              'category': category,
+              'quantity': quantity,
+              'price': price
+          }
+          // insert item to the array
+          db.push(newItem);
+          res.status(201).json(newItem);
         }
-        db.push(newItem);
-        res.status(201).json(newItem);
     } else {
-      res.status(400).json({msg: 'Cannot handle post request'});
+      res.status(400).json({msg: 'Cannot handle post request. You need to supply item, category, quantity and price info.'});
     }
 });
 
-app.delete('/inventory/:id', (req, res, next) => {
+app.delete('/inventory/:id', (req, res) => {
     const {id} = req.params;
     const itemIndex =  db.findIndex( item  => item.id === Number(id) );
     if (itemIndex !== -1) {
+
+      // remove item from array
       db.splice(itemIndex, 1);
-      // TODO:: what info to send?
+
       res.status(200).json({msg: `Item with id ${id} is deleted`});
     } else {
       res.status(400).json({msg: `Cannot handle delete request with specified id: ${id}`});
