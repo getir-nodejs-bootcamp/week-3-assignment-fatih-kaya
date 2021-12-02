@@ -126,7 +126,7 @@ app.post('/inventory', (req, res) => {
         // get unique item categories from db by using lodash library
         const categories = _.uniq(_.map(db, 'category'));
 
-        // check category is valid or not
+        // check category sent by request is valid or not
         if (!categories.includes(category))
           res.status(400).json({msg: `Category '${category}' does not exists in the inventory. Please choose from ${categories.join(' | ')}`});
 
