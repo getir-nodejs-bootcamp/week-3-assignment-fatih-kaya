@@ -79,7 +79,11 @@ app.put('/inventory/:id', (req, res) => {
       'quantity': quantity,
       'price': price
     };
-    res.status(200).json(modifiedItem);
+
+    // copies properties modifiedItem to existing item then return new object
+    Object.assign(item, modifiedItem);
+
+    res.status(200).json(item);
     } else {
       res.status(400).json({msg: 'Cannot handle PUT request'});
     }
