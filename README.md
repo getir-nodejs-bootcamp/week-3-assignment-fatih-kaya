@@ -30,7 +30,7 @@ npm dev
 - curl -X GET http://localhost:3000/ -H "Authorization: Bearer 589b00de-9062-4fd3-8e01-6d3a49d877d1"
 
 or simply via Postman choose Bearer Token under Authorization page and fill token cell with public token.
-
+![bearer token implementation](https://github.com/getir-nodejs-bootcamp/week-3-assignment-fatih-kaya/blob/main/pics/bearer.png)
 If you do not give an authorization server responsds with **code 401**
 
 Following endpoints are available
@@ -42,6 +42,8 @@ Following endpoints are available
 - PATCH http://localhost:3000/inventory/:id
 - POST http://localhost:3000/inventory/
 - DELETE http://localhost:3000/inventory/:id
+
+![GET request](https://github.com/getir-nodejs-bootcamp/week-3-assignment-fatih-kaya/blob/main/pics/get-request.png)
 
 #### Note that you can only modify QUANTITY and PRICE of an item
 
@@ -62,7 +64,7 @@ Following endpoints are available
 #### POST guide
 
 - for the following endpoint POST http://localhost:3000/inventory/5
-- send this JSON as body since POST requests expects 
+- send this JSON as body since POST requests expects
 
 ```
 {
