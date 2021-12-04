@@ -27,7 +27,11 @@ npm dev
 
 ### public key is the following 589b00de-9062-4fd3-8e01-6d3a49d877d1
 
-- curl -X GET http://localhost:3000/ -H "Authorization: Bearer 589b00de-9062-4fd3-8e01-6d3a49d877d1"
+- in order to test via the terminal
+
+```
+curl -X GET http://localhost:3000/ -H "Authorization: Bearer 589b00de-9062-4fd3-8e01-6d3a49d877d1"
+```
 
 or simply via Postman choose Bearer Token under Authorization page and fill token cell with public token.
 ![bearer token implementation](https://github.com/getir-nodejs-bootcamp/week-3-assignment-fatih-kaya/blob/main/pics/bearer.png)
