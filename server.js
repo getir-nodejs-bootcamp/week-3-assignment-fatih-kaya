@@ -3,6 +3,9 @@ const bodyParser = require('body-parser');
 const bearerToken = require('express-bearer-token');
 const _ = require('lodash');
 const db = require('./data/db');
+const morgan = require('morgan');
+const fs = require('fs');
+const path = require('path');
 
 // instantiate express application
 const app = express();
@@ -13,14 +16,21 @@ const PUBLIC_KEY = '589b00de-9062-4fd3-8e01-6d3a49d877d1';
 // define port
 const PORT = process.env.PORT || 3000;
 
+// define log file location
+const location = path.join(__dirname, './logs/access.log')
+
+// create a write stream (in append mode)
+const logStream = fs.createWriteStream(location, { flags: 'a' })
+
+// setup the logger middleware
+app.use(morgan('combined', { stream: logStream }))
+
 // parse json body for POST requests
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// instantiate bearer token as first middleware
+// instantiate bearer token middleware
 app.use(bearerToken());
-
-// TODO: LOG REQUESTS BY MORGAN
 
 // continue middleware with Bearer token Authorization
 app.use(function (req, res, next) {
@@ -177,5 +187,3 @@ app.delete('/inventory/:id', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is listening on ${PORT}`);
 });
-
-// curl -X GET http://localhost:3000/ -H "Authorization: Bearer 589b00de-9062-4fd3-8e01-6d3a49d877d1"
