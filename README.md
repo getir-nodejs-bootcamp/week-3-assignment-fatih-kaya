@@ -35,9 +35,9 @@ curl -X GET http://localhost:3000/ -H "Authorization: Bearer 589b00de-9062-4fd3-
 
 or simply via Postman choose Bearer Token under Authorization page and fill token cell with public token.
 ![bearer token implementation](https://github.com/getir-nodejs-bootcamp/week-3-assignment-fatih-kaya/blob/main/pics/bearer.png)
-If you do not give an authorization server responsds with **code 401**
+If you do not give an authorization server responds with **code 401**
 
-Following endpoints are available
+Following endpoints are available:
 
 - GET http://localhost:3000/
 - GET http://localhost:3000/inventory/
